@@ -1,0 +1,187 @@
+image: python:3.7
+
+stages:
+    - test
+    - quality
+    - build
+    - dist
+
+cache:
+    paths:
+        - bin/
+        - eggs/
+        - parts/
+
+before_script:
+    - apt update && apt install -y iputils-ping
+    - ping -c 1 -W 1 172.17.0.1 && export http_proxy=http://172.17.0.1:3128/
+    - ping -c 1 -W 1 172.17.0.1 && export HTTP_PROXY=http://172.17.0.1:3128/
+    - ping -c 1 -W 1 172.17.0.1 && export https_proxy=http://172.17.0.1:3128/
+    - ping -c 1 -W 1 172.17.0.1 && export HTTPS_PROXY=http://172.17.0.1:3128/
+
+bootstrap:
+    stage: .pre
+    script:
+        - pip install pip==22.3.1 setuptools==65.6.3 zc.buildout==3.0.1 zc.recipe.egg==2.0.7
+        - buildout
+
+test-3.7:
+    stage: test
+    script:
+        - pip install anybadge==1.14.0 coverage==6.5.0 zc.buildout==3.0.1
+        - buildout
+        - mkdir ./coverage
+        - coverage erase
+        - coverage run ./bin/test | tee ./coverage/coverage.log
+        - coverage xml
+        - GLOBAL_COVER=$(coverage report | grep TOTAL | awk '{print $4}' | cut -d '%' -f 1)
+        - anybadge --label=Coverage --file=./coverage/coverage.svg --value=$GLOBAL_COVER coverage
+        - echo "Global tests coverage is $GLOBAL_COVER %"
+    artifacts:
+        paths:
+            - ./coverage/
+            - coverage.xml
+
+pylint:
+    stage: quality
+    allow_failure: true
+    script:
+        - pip install pylint-exit anybadge zc.buildout==3.0.1
+        - buildout
+        - mkdir ./pylint
+        - ./bin/pylint src/pyams_content_api/ | tee ./pylint/pylint.log || pylint-exit $?
+        - PYLINT_SCORE=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' ./pylint/pylint.log)
+        - anybadge --label=Pylint --file=./pylint/pylint.svg --value=$PYLINT_SCORE pylint
+        - echo "Pylint score is $PYLINT_SCORE"
+    artifacts:
+        paths:
+            - ./pylint/
+
+coverage:
+    stage: quality
+    allow_failure: true
+    image:
+        name: sonarsource/sonar-scanner-cli:4.3
+        entrypoint: [""]
+    variables:
+        SONAR_URL: http://sonar.dev-dsm.onf.fr
+        SONAR_HOST_URL: http://sonar.dev-dsm.onf.fr
+    script:
+        - sonar-scanner -Dsonar.qualitygate.wait=true
+    only:
+        - merge_requests
+        - master
+    except:
+        variables:
+            - $CODE_COVERAGE_DISABLED
+
+build-3.7:
+    stage: build
+    script:
+        - pip install zc.buildout==3.0.1
+        - buildout setup setup.py clean --all sdist bdist_egg bdist_wheel
+    artifacts:
+        paths:
+            - ./dist
+    only:
+        refs:
+            - tags
+
+dist-3.7:
+    stage: dist
+    script:
+        - pip install pip==22.3.1 setuptools==65.6.3 zc.buildout==3.0.1 zc.recipe.egg==2.0.7
+        - buildout
+        - ./bin/test
+        - buildout setup setup.py bdist_egg
+        - pip install twine
+        - twine upload --skip-existing dist/*
+    variables:
+        TWINE_USERNAME: $PYPI_USERNAME
+        TWINE_PASSWORD: $PYPI_PASSWORD
+    only:
+        refs:
+            - tags
+    except:
+        variables:
+            - $PYPI_UPLOAD_DISABLED
+
+dist-3.8:
+    stage: dist
+    image: python:3.8
+    script:
+        - pip install pip==22.3.1 setuptools==65.6.3 zc.buildout==3.0.1 zc.recipe.egg==2.0.7
+        - buildout
+        - ./bin/test
+        - buildout setup setup.py bdist_egg
+        - pip install twine
+        - twine upload --skip-existing dist/*
+    variables:
+        TWINE_USERNAME: $PYPI_USERNAME
+        TWINE_PASSWORD: $PYPI_PASSWORD
+    only:
+        refs:
+            - tags
+    except:
+        variables:
+            - $PYPI_UPLOAD_DISABLED
+
+dist-3.9:
+    stage: dist
+    image: python:3.9
+    script:
+        - pip install pip==22.3.1 setuptools==65.6.3 zc.buildout==3.0.1 zc.recipe.egg==2.0.7
+        - buildout
+        - ./bin/test
+        - buildout setup setup.py bdist_egg
+        - pip install twine
+        - twine upload --skip-existing dist/*
+    variables:
+        TWINE_USERNAME: $PYPI_USERNAME
+        TWINE_PASSWORD: $PYPI_PASSWORD
+    only:
+        refs:
+            - tags
+    except:
+        variables:
+            - $PYPI_UPLOAD_DISABLED
+
+dist-3.10:
+    stage: dist
+    image: python:3.10
+    script:
+        - pip install pip==22.3.1 setuptools==65.6.3 zc.buildout==3.0.1 zc.recipe.egg==2.0.7
+        - buildout
+        - ./bin/test
+        - buildout setup setup.py bdist_egg
+        - pip install twine
+        - twine upload --skip-existing dist/*
+    variables:
+        TWINE_USERNAME: $PYPI_USERNAME
+        TWINE_PASSWORD: $PYPI_PASSWORD
+    only:
+        refs:
+            - tags
+    except:
+        variables:
+            - $PYPI_UPLOAD_DISABLED
+
+dist-3.11:
+    stage: dist
+    image: python:3.11
+    script:
+        - pip install pip==22.3.1 setuptools==65.6.3 zc.buildout==3.0.1 zc.recipe.egg==2.0.7
+        - buildout
+        - ./bin/test
+        - buildout setup setup.py bdist_egg
+        - pip install twine
+        - twine upload --skip-existing dist/*
+    variables:
+        TWINE_USERNAME: $PYPI_USERNAME
+        TWINE_PASSWORD: $PYPI_PASSWORD
+    only:
+        refs:
+            - tags
+    except:
+        variables:
+            - $PYPI_UPLOAD_DISABLED
