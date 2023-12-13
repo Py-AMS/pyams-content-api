@@ -38,6 +38,3 @@ class IJSONExporter(Interface):
             extracted from REST API validation, to define requested JSON
             export parameters
         """
-
-    def convert_content(self, **params):
-        """Base JSON object converter"""

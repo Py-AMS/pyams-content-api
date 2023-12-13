@@ -17,6 +17,8 @@ This module defines base JSON exporter class.
 
 __docformat__ = 'restructuredtext'
 
+from typing import Any, Callable, Iterable
+
 from pyams_content_api.feature.json.interfaces import IJSONExporter
 from pyams_file.interfaces.thumbnail import IThumbnails
 from pyams_i18n.interfaces import II18n, INegotiator
@@ -64,22 +66,52 @@ class JSONBaseExporter(ContextRequestAdapter):
         """Base context converter"""
         return {}
 
-    def get_attribute(self, result, attr, name=None, converter=None, context=None):
-        """Get standard attribute"""
+    def get_attribute(self,
+                      result: dict,
+                      attr: str,
+                      name: str = None,
+                      getter: Callable = None,
+                      converter: Callable = None,
+                      context: Any = None):
+        """Get standard attribute
+
+        :param result: dict to be updated in place with getter value
+        :param attr: attribute name
+        :param name: result attribute name; same as `attr` if None
+        :param getter: custom attribute getter
+        :param converter: custom value converter
+        :param context: custom context on which getter is applied
+        """
         if context is None:
             context = self.context
-        if not hasattr(context, attr):
-            return
-        if name is None:
-            name = attr
-        value = getattr(context, attr)
+        if getter is None:
+            getter = getattr
+            if not hasattr(context, attr):
+                return
+        value = getter(context, attr)
         if value or (value is False):
+            if name is None:
+                name = attr
             if converter is not None:
                 value = converter(value)
             result[name] = value
 
-    def get_i18n_attribute(self, result, attr, lang, name=None, context=None):
-        """Get localized attribute"""
+    def get_i18n_attribute(self,
+                           result: dict,
+                           attr: str,
+                           lang: str,
+                           name: str = None,
+                           converter: Callable = None,
+                           context: Any = None):
+        """Get localized attribute
+
+        :param result: dict to be updated in place with getter value
+        :param attr: attribute name
+        :param lang: language
+        :param name: result attribute name; same as `attr` if None
+        :param converter: custom value converter
+        :param context: custom context on which getter is applied
+        """
         if context is None:
             context = self.context
         if not hasattr(context, attr):
@@ -88,11 +120,27 @@ class JSONBaseExporter(ContextRequestAdapter):
             name = attr
         if lang:
             value = II18n(context).query_attribute(attr, lang=lang)
+            if converter is not None:
+                value = converter(value)
             if value:
                 result[name] = value
 
-    def get_html_attribute(self, result, attr, lang, name=None, context=None):
-        """Get HTML attribute"""
+    def get_html_attribute(self,
+                           result: dict,
+                           attr: str,
+                           lang: str,
+                           name: str = None,
+                           converter: Callable = None,
+                           context: Any = None):
+        """Get HTML attribute
+
+        :param result: dict to be updated in place with getter value
+        :param attr: attribute name
+        :param lang: language
+        :param name: result attribute name; same as `attr` if None
+        :param converter: custom value converter
+        :param context: custom context on which getter is applied
+        """
         if context is None:
             context = self.context
         if not hasattr(context, attr):
@@ -102,14 +150,27 @@ class JSONBaseExporter(ContextRequestAdapter):
         if lang:
             value = II18n(context).query_attribute(attr, lang=lang)
             if value:
-                renderer = self.request.registry.queryMultiAdapter((value, self.request),
-                                                                   IHTMLRenderer,
-                                                                   name='oid_to_href')
-                if renderer is not None:
-                    result[name] = renderer.render()
+                if converter is None:
+                    renderer = self.request.registry.queryMultiAdapter((value, self.request),
+                                                                       IHTMLRenderer,
+                                                                       name='oid_to_href')
+                    if renderer is not None:
+                        result[name] = renderer.render()
+                else:
+                    result[name] = converter(value)
 
-    def get_list_attribute(self, result, items, name, **params):
-        """Get list as inner """
+    def get_list_attribute(self,
+                           result: dict,
+                           items: Iterable,
+                           name: str,
+                           **params):
+        """Get inner list attribute
+
+        :param result: dict to be updated in place with getter value
+        :param items: iterable on which getter is applied
+        :param name: attribute name in result
+        :param params: additional params to apply on items JSON converter
+        """
         registry = get_pyramid_registry()
         values = []
         for item in items:
@@ -121,8 +182,18 @@ class JSONBaseExporter(ContextRequestAdapter):
         if values:
             result[name] = values
 
-    def get_file_url(self, attr, context=None, **params):
-        """Get file URL"""
+    def get_file_url(self,
+                     attr: str,
+                     context: Any = None,
+                     **params):
+        """Get file URL on given context
+
+        :param attr: attribute name
+        :param context: custom context on which getter is applied
+        :param params: incoming JSON converter params
+
+        :return: file absolute URL
+        """
         if context is None:
             context = self.context
         file = getattr(context, attr, None)
@@ -132,8 +203,18 @@ class JSONBaseExporter(ContextRequestAdapter):
             return None
         return absolute_url(file, self.request)
 
-    def get_image_url(self, attr, context=None, **params):
-        """Get image URL"""
+    def get_image_url(self,
+                      attr: str,
+                      context: Any = None,
+                      **params):
+        """Get image URL on given context
+
+        :param attr: attribute name
+        :param context: custom context on which getter is applied
+        :param params: incoming JSON converter params
+
+        :return: image absolute URL
+        """
         if context is None:
             context = self.context
         image = getattr(context, attr, None)
