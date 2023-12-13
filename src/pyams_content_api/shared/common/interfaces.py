@@ -15,6 +15,8 @@
 This module defines API related interfaces which are common to all shared contents.
 """
 
+from zope.interface import Interface
+
 
 __docformat__ = 'restructuredtext'
 
@@ -30,3 +32,7 @@ REST_CONTENT_PUBLIC_GETTER_ROUTE_DEFAULT = '/api/content/rest/{content_type}/{oi
 REST_CONTENT_INFO_ROUTE = 'pyams_content.rest.info'
 REST_CONTENT_INFO_ROUTE_SETTING = 'pyams_content.api.rest.info_getter_route'
 REST_CONTENT_INFO_ROUTE_DEFAULT = '/api/content/rest/{oid}/info'
+
+
+class IContentAPIInfo(Interface):
+    """Shared content API additional info"""

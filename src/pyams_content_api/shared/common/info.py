@@ -21,7 +21,7 @@ from cornice.validators import colander_validator
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound, HTTPOk
 
 from pyams_content.shared.common.interfaces.types import IWfTypedSharedContent
-from pyams_content_api.shared.common.interfaces import REST_CONTENT_INFO_ROUTE
+from pyams_content_api.shared.common.interfaces import IContentAPIInfo, REST_CONTENT_INFO_ROUTE
 from pyams_content_api.shared.common.schema import BaseContentInfo
 from pyams_i18n.interfaces import II18n
 from pyams_security.interfaces.base import USE_INTERNAL_API_PERMISSION
@@ -81,6 +81,8 @@ def get_content_info(request):
                 'name': data_type.__name__,
                 'label': II18n(data_type).query_attribute('label', request=request)
             }
+    for name, adapter in request.registry.getAdapters((target,), IContentAPIInfo):
+        info[name] = adapter
     return {
         'status': 'success',
         'info': info
