@@ -10,21 +10,16 @@
 # FOR A PARTICULAR PURPOSE.
 #
 
-"""PyAMS content API.include module
+"""PyAMS_content_api.include module
 
 This module is used for Pyramid integration
 """
 
 import re
-import os.path
 
-import pyams_content_api
-
+from pyams_content_api.shared.common.interfaces import REST_CONTENT_INFO_PATH, REST_CONTENT_INFO_ROUTE
 
 __docformat__ = 'restructuredtext'
-
-from pyams_content_api.shared.common.interfaces import REST_CONTENT_INFO_ROUTE, REST_CONTENT_INFO_ROUTE_DEFAULT, \
-    REST_CONTENT_INFO_ROUTE_SETTING
 
 
 def include_package(config):
@@ -35,8 +30,8 @@ def include_package(config):
 
     # register REST API routes
     config.add_route(REST_CONTENT_INFO_ROUTE,
-                     config.registry.settings.get(REST_CONTENT_INFO_ROUTE_SETTING,
-                                                  REST_CONTENT_INFO_ROUTE_DEFAULT))
+                     config.registry.settings.get(f'{REST_CONTENT_INFO_ROUTE}_route.path',
+                                                  REST_CONTENT_INFO_PATH))
 
     try:
         import pyams_zmi  # pylint: disable=import-outside-toplevel,unused-import

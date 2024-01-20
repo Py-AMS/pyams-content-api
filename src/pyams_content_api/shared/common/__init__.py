@@ -21,7 +21,7 @@ from pyramid.interfaces import IRequest
 
 from pyams_content.shared.common import IWfSharedContent
 from pyams_content_api.feature.json import IJSONExporter, JSONBaseExporter
-from pyams_content_api.shared.common.interfaces import REST_CONTENT_PUBLIC_GETTER_ROUTE_DEFAULT, \
+from pyams_content_api.shared.common.interfaces import REST_CONTENT_PUBLIC_GETTER_PATH, \
     REST_CONTENT_PUBLIC_GETTER_ROUTE_SETTING
 from pyams_sequence.interfaces import ISequentialIdInfo
 from pyams_utils.adapter import adapter_config
@@ -34,7 +34,7 @@ class JSONSharedContentExporter(JSONBaseExporter):
     """Default shared content JSON exporter"""
 
     getter_route_setting = REST_CONTENT_PUBLIC_GETTER_ROUTE_SETTING
-    getter_route_default = REST_CONTENT_PUBLIC_GETTER_ROUTE_DEFAULT
+    getter_route_default = REST_CONTENT_PUBLIC_GETTER_PATH
 
     def convert_content(self, **params):
         """Base context converter"""
