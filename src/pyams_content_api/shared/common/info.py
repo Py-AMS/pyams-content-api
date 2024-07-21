@@ -24,6 +24,7 @@ from pyams_content.shared.common.interfaces.types import IWfTypedSharedContent
 from pyams_content_api.shared.common.interfaces import IContentAPIInfo, REST_CONTENT_INFO_ROUTE
 from pyams_content_api.shared.common.schema import BaseContentInfo
 from pyams_i18n.interfaces import II18n
+from pyams_layer.skin import apply_skin
 from pyams_security.interfaces.base import USE_INTERNAL_API_PERMISSION
 from pyams_security.rest import check_cors_origin, set_cors_headers
 from pyams_sequence.reference import get_reference_target
@@ -31,6 +32,7 @@ from pyams_utils.rest import BaseResponseSchema, http_error, rest_responses
 
 __docformat__ = 'restructuredtext'
 
+from pyams_zmi.skin import AdminSkin
 
 info_service = Service(name=REST_CONTENT_INFO_ROUTE,
                        pyramid_route=REST_CONTENT_INFO_ROUTE,
@@ -67,6 +69,7 @@ def get_content_info(request):
     oid = request.matchdict['oid']
     if not oid:
         return http_error(request, HTTPBadRequest)
+    apply_skin(request, AdminSkin)
     target = get_reference_target(oid, request=request)
     if target is None:
         return http_error(request, HTTPNotFound)
