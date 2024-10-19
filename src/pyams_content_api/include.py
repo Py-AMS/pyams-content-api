@@ -12,12 +12,13 @@
 
 """PyAMS_content_api.include module
 
-This module is used for Pyramid integration
+This module is used for Pyramid integration.
 """
 
 import re
 
-from pyams_content_api.shared.common.interfaces import REST_CONTENT_INFO_PATH, REST_CONTENT_INFO_ROUTE
+from pyams_content_api.shared.common.interfaces import REST_CONTENT_INFO_PATH, REST_CONTENT_INFO_ROUTE, \
+    REST_CONTENT_INFO_ROUTE_SETTING
 
 __docformat__ = 'restructuredtext'
 
@@ -30,7 +31,7 @@ def include_package(config):
 
     # register REST API routes
     config.add_route(REST_CONTENT_INFO_ROUTE,
-                     config.registry.settings.get(f'{REST_CONTENT_INFO_ROUTE}_route.path',
+                     config.registry.settings.get(REST_CONTENT_INFO_ROUTE_SETTING,
                                                   REST_CONTENT_INFO_PATH))
 
     try:
