@@ -17,21 +17,39 @@ This module defines API related interfaces which are common to all shared conten
 
 from zope.interface import Interface
 
-
 __docformat__ = 'restructuredtext'
 
 
-REST_CONTENT_PUBLIC_SEARCH_ROUTE = 'pyams_content.rest.search'
+#
+# Internal API routes
+#
+# These routes are used to access shared contents from internal API; they may require
+# authentication, and can be used to create or update shared contents.
+#
+
+REST_CONTENT_INTERNAL_SEARCH_ROUTE = 'pyams_content.rest.internal.search'
+REST_CONTENT_INTERNAL_SEARCH_ROUTE_SETTING = f'{REST_CONTENT_INTERNAL_SEARCH_ROUTE}_route.path'
+REST_CONTENT_INTERNAL_SEARCH_PATH = '/api/content/rest/internal'
+
+REST_CONTENT_INTERNAL_GETTER_ROUTE = 'pyams_content.rest.internal.getter'
+REST_CONTENT_INTERNAL_GETTER_ROUTE_SETTING = f'{REST_CONTENT_INTERNAL_GETTER_ROUTE}_route.path'
+REST_CONTENT_INTERNAL_GETTER_PATH = '/api/content/rest/{oid}/internal'
+
+
+#
+# Public API routes
+#
+# These routes are used to access shared contents from public API; they can require
+# authentication, but are generally used to get information about published contents.
+#
+
+REST_CONTENT_PUBLIC_SEARCH_ROUTE = 'pyams_content.rest.public.search'
 REST_CONTENT_PUBLIC_SEARCH_ROUTE_SETTING = f'{REST_CONTENT_PUBLIC_SEARCH_ROUTE}_route.path'
-REST_CONTENT_PUBLIC_SEARCH_PATH = '/api/content/rest/{content_type}'
+REST_CONTENT_PUBLIC_SEARCH_PATH = '/api/content/rest'
 
-REST_CONTENT_PUBLIC_GETTER_ROUTE = 'pyams_content.rest.getter'
+REST_CONTENT_PUBLIC_GETTER_ROUTE = 'pyams_content.rest.public.getter'
 REST_CONTENT_PUBLIC_GETTER_ROUTE_SETTING = f'{REST_CONTENT_PUBLIC_GETTER_ROUTE}_route.path'
-REST_CONTENT_PUBLIC_GETTER_PATH = '/api/content/rest/{content_type}/{oid}'
-
-REST_CONTENT_INFO_ROUTE = 'pyams_content.rest.info'
-REST_CONTENT_INFO_ROUTE_SETTING = f'{REST_CONTENT_INFO_ROUTE}_route.path'
-REST_CONTENT_INFO_PATH = '/api/content/rest/{oid}/info'
+REST_CONTENT_PUBLIC_GETTER_PATH = '/api/content/rest/{oid}'
 
 
 class IWfSharedContentCreator(Interface):

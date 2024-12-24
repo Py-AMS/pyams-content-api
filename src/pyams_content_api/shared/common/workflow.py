@@ -17,8 +17,9 @@ This module defines adapters for JSON workflow information output.
 
 from pyramid.interfaces import IRequest
 
-from pyams_content.shared.common import IWfSharedContent
-from pyams_content_api.feature.json import IJSONExporter, JSONBaseExporter
+from pyams_content.shared.common.interfaces import IWfSharedContent
+from pyams_content_api.feature.json import JSONBaseExporter
+from pyams_content_api.feature.json.interfaces import IJSONExporter
 from pyams_utils.adapter import adapter_config
 from pyams_utils.timezone import tztime
 from pyams_workflow.interfaces import IWorkflowPublicationInfo, IWorkflowState
@@ -33,6 +34,7 @@ class JSONSharedContentWorkflowExporter(JSONBaseExporter):
     """JSON shared content workflow exporter"""
 
     is_inner = True
+    conversion_target = None
 
     def convert_content(self, **params):
         """JSON workflow conversion"""

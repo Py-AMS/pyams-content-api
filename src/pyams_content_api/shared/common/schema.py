@@ -95,7 +95,8 @@ class BaseContentSearchParams(MappingSchema):
                               missing=drop)
     display_size = SchemaNode(String(),
                               description="Images display size, in pixels; syntax is 'w640' to specify width, "
-                                          "'h480' to specify height or '640x480' to specify both")
+                                          "'h480' to specify height or '640x480' to specify both",
+                              missing=drop)
     included = SchemaNode(String(),
                           description="Comma separated list of extensions to include into JSON results output",
                           missing=drop)

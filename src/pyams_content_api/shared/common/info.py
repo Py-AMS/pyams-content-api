@@ -18,24 +18,24 @@ This module defines base shared content information getter service.
 from colander import MappingSchema, drop
 from cornice import Service
 from cornice.validators import colander_validator
-from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound, HTTPOk
+from pyramid.httpexceptions import HTTPBadRequest, HTTPNoContent, HTTPNotFound, HTTPOk
 
-from pyams_content.shared.common.interfaces.types import IWfTypedSharedContent
-from pyams_content_api.shared.common.interfaces import IContentAPIInfo, REST_CONTENT_INFO_ROUTE
-from pyams_content_api.shared.common.schema import BaseContentInfo
-from pyams_i18n.interfaces import II18n
+from pyams_content_api.feature.json import IJSONExporter
+from pyams_content_api.shared.common.interfaces import REST_CONTENT_INTERNAL_GETTER_ROUTE
+from pyams_content_api.shared.common.schema import BaseContentInfo, BaseContentSearchParams, ContentSearchParams
 from pyams_layer.skin import apply_skin
 from pyams_security.interfaces.base import USE_INTERNAL_API_PERMISSION
 from pyams_security.rest import check_cors_origin, set_cors_headers
 from pyams_sequence.reference import get_reference_target
 from pyams_utils.rest import BaseResponseSchema, http_error, rest_responses
+from pyams_workflow.interfaces import IWorkflowVersions, VersionError
+from pyams_zmi.skin import AdminSkin
 
 __docformat__ = 'restructuredtext'
 
-from pyams_zmi.skin import AdminSkin
 
-info_service = Service(name=REST_CONTENT_INFO_ROUTE,
-                       pyramid_route=REST_CONTENT_INFO_ROUTE,
+info_service = Service(name=REST_CONTENT_INTERNAL_GETTER_ROUTE,
+                       pyramid_route=REST_CONTENT_INTERNAL_GETTER_ROUTE,
                        description="PyAMS content base information service")
 
 
@@ -45,6 +45,11 @@ def info_options(request):
     return ''
 
 
+class ContentInfoRequest(MappingSchema):
+    """Content information request"""
+    querystring = BaseContentSearchParams(missing=drop)
+    
+    
 class ContentInfoResponse(BaseResponseSchema):
     """Content information schema"""
     info = BaseContentInfo(description="Content info",
@@ -62,6 +67,7 @@ info_get_responses[HTTPOk.code] = ContentInfoResult(
 
 
 @info_service.get(permission=USE_INTERNAL_API_PERMISSION,
+                  schema=ContentInfoRequest(),
                   validators=(check_cors_origin, colander_validator, set_cors_headers),
                   response_schemas=info_get_responses)
 def get_content_info(request):
@@ -70,22 +76,24 @@ def get_content_info(request):
     if not oid:
         return http_error(request, HTTPBadRequest)
     apply_skin(request, AdminSkin)
+    # check version ID
+    version_id = None
+    if '.' in oid:
+        oid, version_id = oid.split('.', 1)
     target = get_reference_target(oid, request=request)
     if target is None:
         return http_error(request, HTTPNotFound)
-    info = {
-        'oid': oid,
-        'title': II18n(target).query_attribute('title', request=request)
-    }
-    if IWfTypedSharedContent.providedBy(target):
-        data_type = target.get_data_type()
-        if data_type is not None:
-            info['data_type'] = {
-                'name': data_type.__name__,
-                'label': II18n(data_type).query_attribute('label', request=request)
-            }
-    for name, adapter in request.registry.getAdapters((target,), IContentAPIInfo):
-        info[name] = adapter
+    if version_id:
+        versions = IWorkflowVersions(target, None)
+        if versions is not None:
+            try:
+                target = versions.get_version(version_id)
+            except VersionError:
+                return http_error(request, HTTPNotFound)
+    exporter = request.registry.queryMultiAdapter((target, request), IJSONExporter)
+    if exporter is None:
+        return http_error(request, HTTPNoContent)
+    info = exporter.to_json(**request.validated.get('querystring', {}))
     return {
         'status': 'success',
         'info': info
