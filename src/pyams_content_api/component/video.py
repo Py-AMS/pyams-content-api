@@ -27,7 +27,7 @@ class JSONExternalVideoParagraphExporter(JSONBaseParagraphExporter):
         result = super().convert_content(**params)
         lang = params.get('lang')
         self.get_attribute(result, 'author')
-        self.get_image_attribute(result, 'description', lang=lang)
+        self.get_i18n_attribute(result, 'description', lang=lang)
         self.get_attribute(result, 'provider_name')
         self.get_attribute(result, 'video_id', context=self.context.settings)
         return result
