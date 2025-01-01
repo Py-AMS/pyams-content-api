@@ -15,8 +15,6 @@
 This module defines base JSON exporter class.
 """
 
-__docformat__ = 'restructuredtext'
-
 from typing import Any, Callable, Iterable
 
 from pyams_content_api.shared.common.schema import DisplayName
@@ -27,6 +25,8 @@ from pyams_utils.adapter import ContextRequestAdapter
 from pyams_utils.interfaces.text import IHTMLRenderer
 from pyams_utils.registry import get_pyramid_registry, get_utility
 from pyams_utils.url import absolute_url
+
+__docformat__ = 'restructuredtext'
 
 
 class JSONBaseExporter(ContextRequestAdapter):
