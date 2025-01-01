@@ -19,6 +19,7 @@ __docformat__ = 'restructuredtext'
 
 from typing import Any, Callable, Iterable
 
+from pyams_content_api.shared.common.schema import DisplayName
 from pyams_content_api.feature.json.interfaces import IJSONExporter
 from pyams_file.interfaces.thumbnail import IThumbnails
 from pyams_i18n.interfaces import II18n, INegotiator
@@ -145,8 +146,6 @@ class JSONBaseExporter(ContextRequestAdapter):
             context = self.context
         if not hasattr(context, attr):
             return
-        if name is None:
-            name = attr
         if lang:
             value = II18n(context).query_attribute(attr, lang=lang)
             if value:
@@ -155,14 +154,14 @@ class JSONBaseExporter(ContextRequestAdapter):
                                                                        IHTMLRenderer,
                                                                        name='oid_to_href')
                     if renderer is not None:
-                        result[name] = renderer.render()
+                        result[name or attr] = renderer.render()
                 else:
-                    result[name] = converter(value)
+                    result[name or attr] = converter(value)
 
     def get_list_attribute(self,
                            result: dict,
                            items: Iterable,
-                           name: str,
+                           name: str = None,
                            **params):
         """Get inner list attribute
 
@@ -182,10 +181,13 @@ class JSONBaseExporter(ContextRequestAdapter):
         if values:
             result[name] = values
 
-    def get_file_url(self,
-                     attr: str,
-                     context: Any = None,
-                     **params):
+    def get_file_attribute(self,
+                           result: dict,
+                           attr: str,
+                           name: str = None,
+                           getter: Callable = None,
+                           context: Any = None,
+                           **params):
         """Get file URL on given context
 
         :param attr: attribute name
@@ -196,17 +198,28 @@ class JSONBaseExporter(ContextRequestAdapter):
         """
         if context is None:
             context = self.context
-        file = getattr(context, attr, None)
+        if getter is None:
+            getter = getattr
+            if not hasattr(context, attr):
+                return
+        file = getter(context, attr)
         if isinstance(file, dict):
             file = file.get(params.get('lang'))
         if not file:
-            return None
-        return absolute_url(file, self.request)
+            return
+        result[name or attr] = {
+            'src': absolute_url(file, self.request),
+            'filename': file.filename,
+            'content_type': file.content_type
+        }
 
-    def get_image_url(self,
-                      attr: str,
-                      context: Any = None,
-                      **params):
+    def get_image_attribute(self,
+                            result: dict,
+                            attr: str,
+                            name: str = None,
+                            getter: Callable = None,
+                            context: Any = None,
+                            **params):
         """Get image URL on given context
 
         :param attr: attribute name
@@ -217,18 +230,27 @@ class JSONBaseExporter(ContextRequestAdapter):
         """
         if context is None:
             context = self.context
-        image = getattr(context, attr, None)
+        if getter is None:
+            getter = getattr
+            if not hasattr(context, attr):
+                return
+        image = getter(context, attr)
         if isinstance(image, dict):
             image = image.get(params.get('lang'))
         if not image:
-            return None
+            return
         thumbnails = IThumbnails(image, None)
         if thumbnails is not None:
-            display_name = params.get('display_name')
-            display_size = params.get('display_size', 'w800')
-            if display_name:
-                thumbnail = thumbnails.get_thumbnail('{}:{}'.format(display_name, display_size))
-            else:
-                thumbnail = thumbnails.get_thumbnail(display_size)
-            return absolute_url(thumbnail, self.request)
-        return absolute_url(image, self.request)
+            thumbnail = thumbnails.get_thumbnail(f"{params.get('display_name', DisplayName.md).value}:"
+                                                 f"{params.get('display_size', '800x800')}")
+            result[name or attr] = {
+                'src': absolute_url(thumbnail, self.request),
+                'filename': image.filename,
+                'content_type': thumbnail.content_type
+            }
+        else:
+            result[name or attr] = {
+                'src': absolute_url(image, self.request),
+                'filename': image.filename,
+                'content_type': image.content_type
+            }
