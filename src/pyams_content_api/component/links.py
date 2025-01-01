@@ -27,15 +27,7 @@ class JSONBaseLinkExporter(JSONBaseExporter):
         lang = params.get('lang')
         self.get_i18n_attribute(result, 'title', lang=lang)
         self.get_i18n_attribute(result, 'description', lang=lang)
-        pictogram = self.context.pictogram
-        if pictogram is not None:
-            output = {}
-            self.get_i18n_attribute(output, 'title', lang=lang, context=pictogram)
-            self.get_i18n_attribute(output, 'short_name', lang=lang, context=pictogram)
-            self.get_i18n_attribute(output, 'alt_title', lang=lang, context=pictogram)
-            self.get_i18n_attribute(output, 'header', lang=lang, context=pictogram)
-            self.get_image_attribute(output, 'image', context=pictogram, **params)
-            result['pictogram'] = output
+        self.get_data_attribute(result, 'pictogram', **params)
         return result
     
     
