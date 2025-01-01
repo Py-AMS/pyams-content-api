@@ -8,13 +8,13 @@
 # FOR A PARTICULAR PURPOSE.
 #
 
-__docformat__ = 'restructuredtext'
-
 from pyramid.interfaces import IRequest
 
 from pyams_content.component.links import IBaseLink, IExternalLink, IInternalLink, IMailtoLink
 from pyams_content_api.feature.json import IJSONExporter, JSONBaseExporter
 from pyams_utils.adapter import adapter_config
+
+__docformat__ = 'restructuredtext'
 
 
 @adapter_config(required=(IBaseLink, IRequest),
