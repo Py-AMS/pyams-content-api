@@ -190,7 +190,9 @@ class JSONBaseExporter(ContextRequestAdapter):
                            **params):
         """Get file URL on given context
 
+        :param result: dict to be updated in place with getter value
         :param attr: attribute name
+        :param getter: custom attribute getter
         :param context: custom context on which getter is applied
         :param params: incoming JSON converter params
 
@@ -222,7 +224,10 @@ class JSONBaseExporter(ContextRequestAdapter):
                             **params):
         """Get image URL on given context
 
+        :param result: dict to be updated in place with getter value
         :param attr: attribute name
+        :param name: name of attribute in result
+        :param getter: custom attribute getter
         :param context: custom context on which getter is applied
         :param params: incoming JSON converter params
 
@@ -254,3 +259,35 @@ class JSONBaseExporter(ContextRequestAdapter):
                 'filename': image.filename,
                 'content_type': image.content_type
             }
+
+    def get_data_attribute(self,
+                           result: dict,
+                           attr: str,
+                           name: str = None,
+                           getter: Callable = None,
+                           context: Any = None,
+                           **params):
+        """Get data attribute on given context
+        
+        This data attribute is converted to JSON using an adapted JSON exporter.
+        
+        :param result: dict to be updated in place with getter value
+        :param attr: source attribute name
+        :param name: name of attribute in result
+        :param getter: custom attribute getter
+        :param context: custom context on which getter is applied
+        """
+        if context is None:
+            context = self.context
+        if getter is None:
+            getter = getattr
+            if not hasattr(context, attr):
+                return
+        value = getter(context, attr)
+        if value or (value is False):
+            if name is None:
+                name = attr
+            exporter = self.request.registry.queryMultiAdapter((value, self.request),
+                                                               IJSONExporter)
+            if exporter is not None:
+                result[name] = exporter.to_json(**params)
