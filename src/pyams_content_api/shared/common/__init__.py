@@ -18,7 +18,7 @@ This module defines base JSON shared content exporter.
 from pyramid.interfaces import IRequest
 
 from pyams_content.shared.common.interfaces import IWfSharedContent
-from pyams_content.shared.common.interfaces.types import IWfTypedSharedContent
+from pyams_content.shared.common.interfaces.types import IDataType, IWfTypedSharedContent
 from pyams_content_api.feature.json import JSONBaseExporter
 from pyams_content_api.feature.json.interfaces import IJSONExporter
 from pyams_content_api.shared.common.interfaces import REST_CONTENT_INTERNAL_GETTER_PATH, \
@@ -89,10 +89,39 @@ class JSONTypedSharedContentExporter(JSONSharedContentExporter):
     def convert_content(self, **params):
         """Base context converter"""
         result = super().convert_content(**params)
-        data_type = self.context.get_data_type()
-        if data_type is not None:
-            result['data_type'] = {
-                'id': data_type.__name__,
-                'label': II18n(data_type).query_attribute('label', request=self.request)
-            }
+        self.get_data_attribute(result, 'data_type', getter=lambda x, y: x.get_data_type(),
+                                **params)
         return result
+
+
+@adapter_config(required=(IDataType, IRequest),
+                provides=IJSONExporter)
+class JSONDataTypeExporter(JSONBaseExporter):
+    """JSON data type exporter"""
+    
+    def convert_content(self, **params):
+        result = {}
+        lang = params.get('lang')
+        self.get_attribute(result, '__name__', name='id')
+        self.get_i18n_attribute(result, 'label', lang=lang)
+        folder = self.context.get_source_folder()
+        if folder is not None:
+            source = {}
+            self.get_i18n_attribute(source, 'title', lang=lang, context=folder)
+            source['absolute_url'] = absolute_url(folder, self.request)
+            source['canonical_url'] = canonical_url(folder, self.request)
+            result['source'] = source
+        self.get_i18n_attribute(result, 'navigation_label', lang=lang)
+        self.get_i18n_attribute(result, 'facets_label', lang=lang)
+        self.get_i18n_attribute(result, 'facets_type_label', lang=lang)
+        self.get_i18n_attribute(result, 'dashboard_label', lang=lang)
+        self.get_attribute(result, 'display_as_tag')
+        self.get_attribute(result, 'color')
+        self.get_data_attribute(result, 'pictogram', **params)
+        status = {}
+        self.get_data_attribute(status, 'pictogram_on', name='on', **params)
+        self.get_data_attribute(status, 'pictogram_off', name='off', **params)
+        if status:
+            result['status'] = status
+        return result
+    
