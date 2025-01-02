@@ -1,6 +1,15 @@
 Changelog
 =========
 
+2.1.0
+-----
+ - updated PyAMS_content common API
+ - added pictograms converter
+ - added associations exporters
+ - added video exporter
+ - added data type exporter
+ - added thesaurus based targets exporters
+
 2.0.0
 -----
  - first "production" release!
