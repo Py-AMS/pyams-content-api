@@ -27,11 +27,11 @@ __docformat__ = 'restructuredtext'
 # authentication, and can be used to create or update shared contents.
 #
 
-REST_CONTENT_INTERNAL_SEARCH_ROUTE = 'pyams_content.rest.internal.search'
+REST_CONTENT_INTERNAL_SEARCH_ROUTE = 'pyams_content.api.rest.internal.search'
 REST_CONTENT_INTERNAL_SEARCH_ROUTE_SETTING = f'{REST_CONTENT_INTERNAL_SEARCH_ROUTE}_route.path'
 REST_CONTENT_INTERNAL_SEARCH_PATH = '/api/content/rest/internal'
 
-REST_CONTENT_INTERNAL_GETTER_ROUTE = 'pyams_content.rest.internal.getter'
+REST_CONTENT_INTERNAL_GETTER_ROUTE = 'pyams_content.api.rest.internal.getter'
 REST_CONTENT_INTERNAL_GETTER_ROUTE_SETTING = f'{REST_CONTENT_INTERNAL_GETTER_ROUTE}_route.path'
 REST_CONTENT_INTERNAL_GETTER_PATH = '/api/content/rest/{oid}/internal'
 
@@ -43,11 +43,11 @@ REST_CONTENT_INTERNAL_GETTER_PATH = '/api/content/rest/{oid}/internal'
 # authentication, but are generally used to get information about published contents.
 #
 
-REST_CONTENT_PUBLIC_SEARCH_ROUTE = 'pyams_content.rest.public.search'
+REST_CONTENT_PUBLIC_SEARCH_ROUTE = 'pyams_content.api.rest.public.search'
 REST_CONTENT_PUBLIC_SEARCH_ROUTE_SETTING = f'{REST_CONTENT_PUBLIC_SEARCH_ROUTE}_route.path'
 REST_CONTENT_PUBLIC_SEARCH_PATH = '/api/content/rest'
 
-REST_CONTENT_PUBLIC_GETTER_ROUTE = 'pyams_content.rest.public.getter'
+REST_CONTENT_PUBLIC_GETTER_ROUTE = 'pyams_content.api.rest.public.getter'
 REST_CONTENT_PUBLIC_GETTER_ROUTE_SETTING = f'{REST_CONTENT_PUBLIC_GETTER_ROUTE}_route.path'
 REST_CONTENT_PUBLIC_GETTER_PATH = '/api/content/rest/{oid}'
 
