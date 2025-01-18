@@ -1,6 +1,10 @@
 Changelog
 =========
 
+2.1.1
+-----
+ - updated configuration settings keys
+
 2.1.0
 -----
  - updated PyAMS_content common API
