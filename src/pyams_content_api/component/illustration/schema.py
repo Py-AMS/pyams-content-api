@@ -8,6 +8,8 @@
 # FOR A PARTICULAR PURPOSE.
 #
 
+from enum import Enum as BuiltinEnum
+
 from colander import MappingSchema, SchemaNode, String, drop
 
 __docformat__ = 'restructuredtext'
@@ -37,3 +39,17 @@ class IllustrationInfo(BaseIllustrationInfo):
 
 class IllustrationParagraph(IllustrationInfo):
     """Illustration paragraph schema"""
+
+
+class DisplayName(BuiltinEnum):
+    """Image display enumeration"""
+    xs = 'xs'
+    sm = 'sm'
+    md = 'md'
+    lg = 'lg'
+    xl = 'xl'
+    portrait = 'portrait'
+    square = 'square'
+    pano = 'pano'
+    card = 'card'
+    banner = 'banner'

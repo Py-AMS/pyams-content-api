@@ -24,7 +24,6 @@ from pyams_content_api.feature.json.interfaces import IJSONExporter
 from pyams_content_api.shared.common.interfaces import REST_CONTENT_INTERNAL_GETTER_PATH, \
     REST_CONTENT_INTERNAL_GETTER_ROUTE_SETTING, REST_CONTENT_PUBLIC_GETTER_PATH, \
     REST_CONTENT_PUBLIC_GETTER_ROUTE_SETTING
-from pyams_i18n.interfaces import II18n
 from pyams_layer.interfaces import ISkin
 from pyams_layer.skin import apply_skin
 from pyams_sequence.interfaces import ISequentialIdInfo

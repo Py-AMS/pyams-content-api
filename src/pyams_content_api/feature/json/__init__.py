@@ -17,7 +17,6 @@ This module defines base JSON exporter class.
 
 from typing import Any, Callable, Iterable
 
-from pyams_content_api.shared.common.schema import DisplayName
 from pyams_content_api.feature.json.interfaces import IJSONExporter
 from pyams_file.interfaces.thumbnail import IThumbnails
 from pyams_i18n.interfaces import II18n, INegotiator
@@ -233,6 +232,9 @@ class JSONBaseExporter(ContextRequestAdapter):
 
         :return: image absolute URL
         """
+
+        from pyams_content_api.component.illustration.schema import DisplayName
+
         if context is None:
             context = self.context
         if getter is None:

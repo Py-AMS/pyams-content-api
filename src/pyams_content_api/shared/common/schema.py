@@ -15,27 +15,12 @@
 This module defines base content schemas.
 """
 
-from enum import Enum as BuiltinEnum
-
 from colander import DateTime, Enum, Integer, MappingSchema, OneOf, SchemaNode, String, drop
 
 from pyams_content.workflow import STATES_IDS
+from pyams_content_api.component.illustration.schema import DisplayName
 
 __docformat__ = 'restructuredtext'
-
-
-class DisplayName(BuiltinEnum):
-    """Image display enumeration"""
-    xs = 'xs'
-    sm = 'sm'
-    md = 'md'
-    lg = 'lg'
-    xl = 'xl'
-    portrait = 'portrait'
-    square = 'square'
-    pano = 'pano'
-    card = 'card'
-    banner = 'banner'
 
 
 class ContentDataType(MappingSchema):
