@@ -14,13 +14,10 @@ from pyramid.interfaces import IRequest
 
 from pyams_content.component.gallery import IGalleryFile
 from pyams_content.component.gallery.interfaces import IGalleryParagraph
-from pyams_content_api.shared.common.schema import DisplayName
 from pyams_content_api.component.paragraph import JSONBaseParagraphExporter
 from pyams_content_api.feature.json import JSONBaseExporter
 from pyams_content_api.feature.json.interfaces import IJSONExporter
-from pyams_file.interfaces.thumbnail import IThumbnails
 from pyams_utils.adapter import adapter_config
-from pyams_utils.url import absolute_url
 
 
 @adapter_config(required=(IGalleryParagraph, IRequest),

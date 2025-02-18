@@ -13,10 +13,8 @@ __docformat__ = 'restructuredtext'
 from pyramid.interfaces import IRequest
 
 from pyams_content.component.cards import ICardsParagraph
-from pyams_content_api.shared.common.schema import DisplayName
 from pyams_content_api.component.paragraph import JSONBaseParagraphExporter
 from pyams_content_api.feature.json import IJSONExporter, JSONBaseExporter
-from pyams_file.interfaces.thumbnail import IThumbnails
 from pyams_i18n.interfaces import II18n
 from pyams_portal.portlets.cards import ICard, ICardsContainer
 from pyams_utils.adapter import adapter_config
@@ -55,17 +53,6 @@ class JSONCardExporter(JSONBaseExporter):
         self.get_i18n_attribute(result, 'title', lang=lang)
         self.get_i18n_attribute(result, 'body', lang=lang)
         self.get_image_attribute(result, 'illustration')
-        # illustration = self.context.illustration
-        # if illustration:
-        #     thumbnails = IThumbnails(illustration, None)
-        #     if thumbnails is not None:
-        #         thumbnail = thumbnails.get_thumbnail(f"{params.get('display_name', DisplayName.md).value}:"
-        #                                              f"{params.get('display_size', '800x800')}")
-        #         if thumbnail is not None:
-        #             result['illustration'] = {
-        #                 'src': absolute_url(thumbnail, self.request),
-        #                 'content_type': thumbnail.content_type
-        #             }
         i18n = II18n(self.context)
         button = {
             'status': self.context.button_status,

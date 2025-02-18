@@ -16,9 +16,8 @@
 
 from pyramid.interfaces import IRequest
 
-from pyams_content.component.illustration import IBaseIllustration
-from pyams_content.component.illustration.interfaces import IIllustration, IIllustrationParagraph, IIllustrationTarget, \
-    ILinkIllustration, ILinkIllustrationTarget
+from pyams_content.component.illustration.interfaces import IBaseIllustration, IIllustration, IIllustrationParagraph, \
+    IIllustrationTarget, ILinkIllustration, ILinkIllustrationTarget
 from pyams_content_api.component.paragraph import JSONBaseParagraphExporter
 from pyams_content_api.feature.json import IJSONExporter, JSONBaseExporter
 from pyams_utils.adapter import adapter_config
