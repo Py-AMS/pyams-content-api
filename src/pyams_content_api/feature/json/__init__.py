@@ -68,7 +68,7 @@ class JSONBaseExporter(ContextRequestAdapter):
 
     def get_attribute(self,
                       result: dict,
-                      attr: str,
+                      attr: str = None,
                       name: str = None,
                       getter: Callable = None,
                       converter: Callable = None,
@@ -89,7 +89,7 @@ class JSONBaseExporter(ContextRequestAdapter):
             if not hasattr(context, attr):
                 return
         value = getter(context, attr)
-        if value or (value is False):
+        if value is not None:
             if name is None:
                 name = attr
             if converter is not None:
