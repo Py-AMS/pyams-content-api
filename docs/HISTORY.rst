@@ -1,6 +1,10 @@
 Changelog
 =========
 
+2.1.3
+-----
+ - updated Gitlab CI
+
 2.1.2
 -----
  - small update in JSON base exporter
