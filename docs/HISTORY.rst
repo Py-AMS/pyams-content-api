@@ -1,6 +1,11 @@
 Changelog
 =========
 
+2.1.2
+-----
+ - small update in JSON base exporter
+ - imports cleanup
+
 2.1.1
 -----
  - updated configuration settings keys
